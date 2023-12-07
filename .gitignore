@@ -1,0 +1,8 @@
+__pycache__/
+jsonviewer/__pycache__/
+pdfviewer/__pycache__/
+txtviewer/__pycache__/
+venv/
+train/
+.env
+*.db
