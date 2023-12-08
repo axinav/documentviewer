@@ -9,6 +9,7 @@ from PySide6.QtCore import (QFileInfo, QMimeDatabase, QTimer)
 from txtviewer.txtviewer import TxtViewer
 from jsonviewer.jsonviewer import JsonViewer
 from pdfviewer.pdfviewer import PdfViewer
+from imgviewer.imgviewer import ImgViewer
 
 
 class DefaultPolicy(Enum):
@@ -28,7 +29,7 @@ class ViewerFactory:
         self._displayWidget = displayWidget
         self._mainWindow = mainWindow
         self._mimeTypes = []
-        for v in [PdfViewer(), JsonViewer(), TxtViewer()]:
+        for v in [PdfViewer(), JsonViewer(), TxtViewer(), ImgViewer()]:
             self._viewers[v.viewerName()] = v
             if v.isDefaultViewer():
                 self._defaultViewer = v
