@@ -167,6 +167,7 @@ class MainWindow(QMainWindow):
             return
         self.saveViewerSettings()
         self._viewer.cleanup()
+        # self.ui.setupUi(self)
 
     def restoreViewerSettings(self):
         if not self._viewer:

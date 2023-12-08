@@ -126,6 +126,8 @@ class AbstractViewer(QObject):
         if self._file:
             self._file = None
         self._menus.clear()
+        for tb in self._toolBars:
+            self.mainWindow().removeToolBar(tb)
         self._toolBars.clear()
 
     def fileMenu(self):
