@@ -104,22 +104,22 @@ class PdfViewer(AbstractViewer):
     def viewerName(self):
         return "PdfViewer"
 
-    @Slot(QModelIndex, QModelIndex)
-    def _currentRowChanged(self, current, previous):
-        if previous == current:
-            return
-
-        nav = self._pdfView.pageNavigator()
-        row = current.row()
-        if nav.currentPage() == row:
-            return
-        nav.jump(row, QPointF(), nav.currentZoom())
-
-    @Slot(int)
-    def _pageChanged(self, page):
-        if self._pages.currentIndex().row() == page:
-            return
-        self._pages.setCurrentIndex(self._pages.model().index(page, 0))
+    # @Slot(QModelIndex, QModelIndex)
+    # def _currentRowChanged(self, current, previous):
+    #     if previous == current:
+    #         return
+    #
+    #     nav = self._pdfView.pageNavigator()
+    #     row = current.row()
+    #     if nav.currentPage() == row:
+    #         return
+    #     nav.jump(row, QPointF(), nav.currentZoom())
+    #
+    # @Slot(int)
+    # def _pageChanged(self, page):
+    #     if self._pages.currentIndex().row() == page:
+    #         return
+    #     self._pages.setCurrentIndex(self._pages.model().index(page, 0))
 
     @Slot()
     def openPdfFile(self):
