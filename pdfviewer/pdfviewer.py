@@ -79,12 +79,12 @@ class PdfViewer(AbstractViewer):
         self._zoomSelector.zoomFactorChanged.connect(self._pdfView.setZoomFactor)
         self._zoomSelector.reset()
 
-        bookmarkModel = QPdfBookmarkModel(self)
-        bookmarkModel.setDocument(self._document)
-        self._uiAssets_tabs.clear()
-        self._bookmarks = QTreeView(self._uiAssets_tabs)
-        self._bookmarks.activated.connect(self.bookmarkSelected)
-        self._bookmarks.setModel(bookmarkModel)
+        # bookmarkModel = QPdfBookmarkModel(self)
+        # bookmarkModel.setDocument(self._document)
+        # self._uiAssets_tabs.clear()
+        # self._bookmarks = QTreeView(self._uiAssets_tabs)
+        # self._bookmarks.activated.connect(self.bookmarkSelected)
+        # self._bookmarks.setModel(bookmarkModel)
         self._pdfView.setDocument(self._document)
         self._pdfView.setPageMode(QPdfView.PageMode.MultiPage)
 
@@ -92,14 +92,14 @@ class PdfViewer(AbstractViewer):
         if not self._document.pageCount():
             return
 
-        self._pages = QListView(self._uiAssets_tabs)
-        self._pages.setModel(self._document.pageModel())
+        # self._pages = QListView(self._uiAssets_tabs)
+        # self._pages.setModel(self._document.pageModel())
 
-        self._pages.selectionModel().currentRowChanged.connect(self._currentRowChanged)
-        self._pdfView.pageNavigator().currentPageChanged.connect(self._pageChanged)
+        # self._pages.selectionModel().currentRowChanged.connect(self._currentRowChanged)
+        # self._pdfView.pageNavigator().currentPageChanged.connect(self._pageChanged)
 
-        self._uiAssets_tabs.addTab(self._pages, "Pages")
-        self._uiAssets_tabs.addTab(self._bookmarks, "Bookmarks")
+        # self._uiAssets_tabs.addTab(self._pages, "Pages")
+        # self._uiAssets_tabs.addTab(self._bookmarks, "Bookmarks")
 
     def viewerName(self):
         return "PdfViewer"
@@ -142,7 +142,7 @@ class PdfViewer(AbstractViewer):
         return self._document if self._document.pageCount() > 0 else False
 
     def supportsOverview(self):
-        return True
+        return False
 
     def printDocument(self, printer):
         if not self.hasContent():
