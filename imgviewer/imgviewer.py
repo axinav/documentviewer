@@ -5,6 +5,7 @@ from PySide6.QtGui import QAction, QGuiApplication, QIcon, QKeySequence, QPixmap
 from PySide6.QtCore import QDir, QFile, QFileInfo, QTextStream, Qt, Slot
 
 from abstractviewer import AbstractViewer
+from imgviewer.QCImageViewer import QCImageViewer
 
 
 class ImgViewer(AbstractViewer):
@@ -13,7 +14,8 @@ class ImgViewer(AbstractViewer):
         self.uiInitialized.connect(self.setupImgUi)
 
     def init(self,file, parent, mainWindow):
-        self._imgView = QGraphicsView(parent)
+        self._imgView = QCImageViewer(parent)
+        # self._imgView = QGraphicsView(parent)
         super().init(file, self._imgView, mainWindow)
         self._scene = QGraphicsScene()
 
@@ -31,5 +33,7 @@ class ImgViewer(AbstractViewer):
         fullName = QFileInfo(self._file)
         pixmap = QPixmap(fullName.filePath())
         item = QGraphicsPixmapItem(pixmap)
-        self._scene.addItem(item)
-        self._imgView.setScene(self._scene)
+        self._imgView.load_single_image(fullName.filePath())
+        # self._scene.addItem(item)
+        # self._imgView.setScene(self._scene)
+        # self._imgView.fitInView(pixmap.rect())
