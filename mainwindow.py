@@ -3,7 +3,7 @@
 
 from PySide6.QtWidgets import (QDialog, QFileDialog, QMainWindow,
                                QMessageBox, QToolButton)
-from PySide6.QtCore import (QDir, QFile, QFileInfo, QSettings, Slot)
+from PySide6.QtCore import (QDir, QFile, QFileInfo, QMimeDatabase, QSettings, Slot)
 
 from ui_mainwindow import Ui_MainWindow
 from viewerfactory import ViewerFactory
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
 
         self._currentDir = QDir()
+        self.allDocsName =[] 
         self._viewer = None
         self._recentFiles = RecentFiles()
 
@@ -41,8 +42,8 @@ class MainWindow(QMainWindow):
         self.ui.actionAbout.triggered.connect(self.onActionAboutTriggered)
         self.ui.actionAboutQt.triggered.connect(self.onActionAboutQtTriggered)
 
-        self._recentFiles = RecentFiles(self.ui.actionRecent)
-        self._recentFiles.countChanged.connect(self._recentFilesCountChanged)
+        # self._recentFiles = RecentFiles(self.ui.actionRecent)
+        # self._recentFiles.countChanged.connect(self._recentFilesCountChanged)
 
         self.readSettings()
         self._factory = ViewerFactory(self.ui.viewArea, self)
@@ -55,6 +56,7 @@ class MainWindow(QMainWindow):
         button = self.ui.mainToolBar.widgetForAction(self.ui.actionRecent)
         if button:
             self.ui.actionRecent.triggered.connect(button.showMenu)
+        self.ui.actionForward.triggered.connect(self.openNextDoc)
 
     @Slot(int)
     def _recentFilesCountChanged(self, count):
@@ -67,9 +69,11 @@ class MainWindow(QMainWindow):
     def onActionOpenTriggered(self):
         fileDialog = QFileDialog(self, "Open Document",
                                  self._currentDir.absolutePath())
-        while (fileDialog.exec() == QDialog.Accepted
-               and not self.openFile(fileDialog.selectedFiles()[0])):
-            pass
+        if (fileDialog.exec() == QDialog.Accepted
+               and self.openFile(fileDialog.selectedFiles()[0])):
+            self.allDocsName = self.getAllFileNames()
+            fileInfo = QFileInfo(fileDialog.selectedFiles()[0])
+            self.currentIndex = self.allDocsName.index(fileInfo.fileName())
 
     @Slot(str)
     def openFile(self, fileName):
@@ -81,7 +85,7 @@ class MainWindow(QMainWindow):
 
         fileInfo = QFileInfo(file)
         self._currentDir = fileInfo.dir()
-        self._recentFiles.addFile(fileInfo.absoluteFilePath())
+        # self._recentFiles.addFile(fileInfo.absoluteFilePath())
 
         # If a viewer is already open, clean it up and save its settings
         self.resetViewer()
@@ -104,6 +108,12 @@ class MainWindow(QMainWindow):
         return True
 
     @Slot()
+    def openNextDoc(self):
+        if self.currentIndex+1 < len(self.allDocsName):
+            filePath = QFileInfo(self._currentDir,self.allDocsName[self.currentIndex+1]).filePath()
+            self.openFile(filePath)
+            self.currentIndex +=1
+    @Slot()
     def onActionAboutTriggered(self):
         viewerNames = ", ".join(self._factory.viewerNames())
         mimeTypes = '\n'.join(self._factory.supportedMimeTypes())
@@ -122,6 +132,10 @@ class MainWindow(QMainWindow):
     def onActionAboutQtTriggered(self):
         QMessageBox.aboutQt(self)
 
+    def getAllFileNames(self):
+        supportedSuffixes = [j for i in self._factory.supportedMimeTypes() for j in QMimeDatabase().mimeTypeForName(i).globPatterns() ]
+        return  self._currentDir.entryList(supportedSuffixes)
+
     def readSettings(self):
         settings = QSettings()
 
@@ -137,7 +151,7 @@ class MainWindow(QMainWindow):
             self.restoreState(mainWindowState)
 
         # Restore recent files
-        self._recentFiles.restoreFromSettings(settings, settingsFiles)
+        # self._recentFiles.restoreFromSettings(settings, settingsFiles)
 
     def saveSettings(self):
         settings = QSettings()

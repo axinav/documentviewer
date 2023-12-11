@@ -52,10 +52,10 @@ class PdfViewer(AbstractViewer):
         self._pageSelector.currentPageChanged.connect(self.pageSelected)
         nav.currentPageChanged.connect(self._pageSelector.setCurrentPage)
         nav.backAvailableChanged.connect(self._uiAssets_back.setEnabled)
-        self._actionBack = self._uiAssets_back
-        self._actionForward = self._uiAssets_forward
-        self._uiAssets_back.triggered.connect(self.onActionBackTriggered)
-        self._uiAssets_forward.triggered.connect(self.onActionForwardTriggered)
+        # self._actionBack = self._uiAssets_back
+        # self._actionForward = self._uiAssets_forward
+        # self._uiAssets_back.triggered.connect(self.onActionBackTriggered)
+        # self._uiAssets_forward.triggered.connect(self.onActionForwardTriggered)
 
         self._toolBar.addSeparator()
         self._toolBar.addWidget(self._zoomSelector)
@@ -72,8 +72,8 @@ class PdfViewer(AbstractViewer):
         self._toolBar.addAction(actionZoomOut)
         actionZoomOut.triggered.connect(self.onActionZoomOutTriggered)
 
-        nav.backAvailableChanged.connect(self._actionBack.setEnabled)
-        nav.forwardAvailableChanged.connect(self._actionForward.setEnabled)
+        # nav.backAvailableChanged.connect(self._actionBack.setEnabled)
+        # nav.forwardAvailableChanged.connect(self._actionForward.setEnabled)
 
         self._zoomSelector.zoomModeChanged.connect(self._pdfView.setZoomMode)
         self._zoomSelector.zoomFactorChanged.connect(self._pdfView.setZoomFactor)
