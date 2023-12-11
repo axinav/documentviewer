@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
 
         self._viewer.initViewer(self.ui.actionBack, self.ui.actionForward,
                                 self.ui.menuHelp.menuAction(),
-                                self.ui.tabWidget)
+                                )
         self.restoreViewerSettings()
         self.ui.scrollArea.setWidget(self._viewer.widget())
         return True

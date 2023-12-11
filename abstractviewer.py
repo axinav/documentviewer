@@ -175,13 +175,13 @@ class AbstractViewer(QObject):
         self._printingEnabled = enabled
         self.printingEnabledChanged.emit(enabled)
 
-    def initViewer(self, back, forward, help, tabs):
+    def initViewer(self, back, forward, help):
         self._uiAssets_back = back
         self._uiAssets_forward = forward
         self._uiAssets_help = help
-        self._uiAssets_tabs = tabs
+        # self._uiAssets_tabs = tabs
         # Tabs can be populated individually by the viewer, if it
         # supports overview
-        tabs.clear()
-        tabs.setVisible(self.supportsOverview())
+        # tabs.clear()
+        # tabs.setVisible(self.supportsOverview())
         self.uiInitialized.emit()
