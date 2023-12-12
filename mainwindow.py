@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
         if button:
             self.ui.actionRecent.triggered.connect(button.showMenu)
         self.ui.actionForward.triggered.connect(self.openNextDoc)
+        self.ui.actionBack.triggered.connect(self.openPrevDoc)
 
     @Slot(int)
     def _recentFilesCountChanged(self, count):
@@ -107,6 +108,18 @@ class MainWindow(QMainWindow):
         self.ui.scrollArea.setWidget(self._viewer.widget())
         return True
 
+    @Slot()
+    def openNextDoc(self):
+        if self.currentIndex+1 < len(self.allDocsName):
+            filePath = QFileInfo(self._currentDir,self.allDocsName[self.currentIndex+1]).filePath()
+            self.openFile(filePath)
+            self.currentIndex +=1
+    @Slot()
+    def openPrevDoc(self):
+        if self.currentIndex-1 > -1:
+            filePath = QFileInfo(self._currentDir,self.allDocsName[self.currentIndex-1]).filePath()
+            self.openFile(filePath)
+            self.currentIndex -=1
     @Slot()
     def openNextDoc(self):
         if self.currentIndex+1 < len(self.allDocsName):
