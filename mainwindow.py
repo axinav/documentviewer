@@ -1,9 +1,11 @@
 # Copyright (C) 2023 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
+import re
 from PySide6.QtWidgets import (QDialog, QFileDialog, QMainWindow,
                                QMessageBox, QToolButton)
 from PySide6.QtCore import (QDir, QFile, QFileInfo, QMimeDatabase, QSettings, Slot)
+from project import Project
 
 from ui_mainwindow import Ui_MainWindow
 from viewerfactory import ViewerFactory
@@ -35,12 +37,16 @@ class MainWindow(QMainWindow):
         self._currentDir = QDir()
         self.allDocsName =[] 
         self._viewer = None
-        self._recentFiles = RecentFiles()
+        # self._recentFiles = RecentFiles()
 
         self.ui.setupUi(self)
         self.ui.actionOpen.triggered.connect(self.onActionOpenTriggered)
         self.ui.actionAbout.triggered.connect(self.onActionAboutTriggered)
         self.ui.actionAboutQt.triggered.connect(self.onActionAboutQtTriggered)
+        self.ui.actionNewProject.triggered.connect(self.onActionOpenProjectTriggered)
+
+        self.project = None
+        self.inMemory = True
 
         # self._recentFiles = RecentFiles(self.ui.actionRecent)
         # self._recentFiles.countChanged.connect(self._recentFilesCountChanged)
@@ -50,12 +56,12 @@ class MainWindow(QMainWindow):
         viewers = ", ".join(self._factory.viewerNames())
         self.statusBar().showMessage(f'Available viewers: {viewers}')
 
-        menu = RecentFileMenu(self, self._recentFiles)
-        self.ui.actionRecent.setMenu(menu)
-        menu.fileOpened.connect(self.openFile)
-        button = self.ui.mainToolBar.widgetForAction(self.ui.actionRecent)
-        if button:
-            self.ui.actionRecent.triggered.connect(button.showMenu)
+        # menu = RecentFileMenu(self, self._recentFiles)
+        # self.ui.actionRecent.setMenu(menu)
+        # menu.fileOpened.connect(self.openFile)
+        # button = self.ui.mainToolBar.widgetForAction(self.ui.actionRecent)
+        # if button:
+        #     self.ui.actionRecent.triggered.connect(button.showMenu)
         self.ui.actionForward.triggered.connect(self.openNextDoc)
         self.ui.actionBack.triggered.connect(self.openPrevDoc)
 
@@ -66,7 +72,21 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         self.saveSettings()
 
-    @Slot(int)
+    def ProjectExistDecorator(func):
+        def wrapper(self):
+            if self.project:
+                func(self)
+            else:
+                msgRes = self.msgBoxNoProjectWarning()
+                if msgRes == 0:
+                    self.project=Project()
+                    func(self)
+                elif msgRes==1:
+                    self.onActionOpenProjectTriggered()
+                    func(self)
+        return wrapper
+    # @Slot()
+    @ProjectExistDecorator
     def onActionOpenTriggered(self):
         fileDialog = QFileDialog(self, "Open Document",
                                  self._currentDir.absolutePath())
@@ -120,12 +140,25 @@ class MainWindow(QMainWindow):
             filePath = QFileInfo(self._currentDir,self.allDocsName[self.currentIndex-1]).filePath()
             self.openFile(filePath)
             self.currentIndex -=1
+
+    def openProject(self, path):
+        if not self.project:
+            self.project = Project(projectName=path)
+
+    def msgBoxNoProjectWarning(self):
+        msgBox = QMessageBox()
+        msgBox.setText("Do you want to continue with out the project or to select the project")
+        msgBox.setInformativeText("The Project is missing!")
+        but0 = msgBox.addButton("Continue",QMessageBox.ActionRole)
+        but1 = msgBox.addButton("Open project",QMessageBox.ActionRole)
+        return msgBox.exec()
     @Slot()
-    def openNextDoc(self):
-        if self.currentIndex+1 < len(self.allDocsName):
-            filePath = QFileInfo(self._currentDir,self.allDocsName[self.currentIndex+1]).filePath()
-            self.openFile(filePath)
-            self.currentIndex +=1
+    def onActionOpenProjectTriggered(self):
+        openDialog = QFileDialog(self, "Select or type Projec filename")
+        openDialog.setNameFilter("ProjectDB (*.db)")
+        openDialog.setDefaultSuffix("db")
+        if openDialog.exec():
+            self.openProject(openDialog.selectedFiles()[0])
     @Slot()
     def onActionAboutTriggered(self):
         viewerNames = ", ".join(self._factory.viewerNames())
@@ -176,7 +209,7 @@ class MainWindow(QMainWindow):
         settings.setValue(settingsMainWindow, self.saveState())
 
         # Save recent files
-        self._recentFiles.saveSettings(settings, settingsFiles)
+        # self._recentFiles.saveSettings(settings, settingsFiles)
 
         settings.sync()
 
